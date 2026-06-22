@@ -12,7 +12,7 @@
             "repo": "kyleljohnson/adotestplans",
             "file": "SampleTests/LoginTests.cs",
             "fullyQualifiedName": "SampleTests.LoginTests.VerifyLoginSuccess",
-            "framework": "NUnit"
+            "framework": "MSTest"
           },
           "steps": [
             {
