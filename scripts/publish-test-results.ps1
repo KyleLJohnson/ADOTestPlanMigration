@@ -255,9 +255,9 @@ function Get-TrxResults {
             TestName           = $result.testName
             Outcome            = Convert-TrxOutcomeToAdoOutcome $result.outcome
             DurationInMs       = Convert-DurationToMilliseconds $result.duration
-            StartTime          = $result.startTime
-            EndTime            = $result.endTime
-            ComputerName       = $result.computerName
+            StartTime          = if ($result.startTime) { $result.startTime } else { $null }
+            EndTime            = if ($result.endTime) { $result.endTime } else { $null }
+            ComputerName       = if ($result.computerName) { $result.computerName } else { $null }
             ErrorMessage       = $errorMessage
             StackTrace         = $stackTrace
         }
