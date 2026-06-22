@@ -18,9 +18,18 @@ jobs:
           dotnet-version: '10.0.x'
           
       - name: Azure CLI Login (Service Principal)
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+          allow-no-subscriptions: true
+
+      - name: Validate Azure CLI token for Azure DevOps
+        shell: pwsh
+        run: |
+          az account list --all --output table | Out-String
+          $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
+          if ([string]::IsNullOrWhiteSpace($token)) {
+            throw "Failed to acquire Azure DevOps access token after login."
 
       - name: Restore
         run: dotnet restore ./src/SampleTests/
