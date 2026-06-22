@@ -26,10 +26,6 @@ Example:
   -MappingPath "./mapping/testcase-mapping.json"
 #>
 
-$trxFile = "./data/test-results/results.trx"
-
-Write-Host "Parsing TRX and preparing ADO test run payload..."
-
 param(
     [string]$TrxPath = "./data/test-results/results.trx",
     [string]$MappingPath = "./mapping/testcase-mapping.json",
