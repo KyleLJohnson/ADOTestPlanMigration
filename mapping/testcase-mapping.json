@@ -11,7 +11,7 @@
           "automation": {
             "repo": "kyleljohnson/adotestplans",
             "file": "SampleTests/LoginTests.cs",
-            "fullyQualifiedName": "SampleTests.LoginTests.VerifyLoginSuccess"",
+            "fullyQualifiedName": "SampleTests.LoginTests.VerifyLoginSuccess",
             "framework": "NUnit"
           },
           "steps": [
