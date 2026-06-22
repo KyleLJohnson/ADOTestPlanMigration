@@ -1,6 +1,16 @@
+# Simplified placeholder logic
+# Extend with:
+# - Parse TRX XML
+# - Map to ADO TestCase IDs
+# - POST to ADO Test Runs API
+# Simplified placeholder logic
+# Extend with:
+# - Parse TRX XML
+# - Map to ADO TestCase IDs
+# - POST to ADO Test Runs API
 <#
 .SYNOPSIS
-Publishes .NET TRX test results back to Azure DevOps Test Runs.
+Publishes .NET TRX test results back to Azure DevOps Test Runs using Entra authentication.
 
 .DESCRIPTION
 This script:
@@ -12,13 +22,15 @@ This script:
 Required environment variables:
 - ADO_ORG
 - ADO_PROJECT
-- ADO_PAT
 
 Optional environment variables:
 - ADO_BUILD_ID
 - GITHUB_RUN_ID
 - GITHUB_REPOSITORY
 - GITHUB_SHA
+
+Prerequisites:
+- Azure CLI installed and authenticated (az login)
 
 Example:
 ./scripts/publish-test-results.ps1 `
@@ -51,18 +63,46 @@ function Write-Fail {
     Write-Host "[ERROR] $Message" -ForegroundColor Red
 }
 
+function Get-EntraAccessToken {
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$TenantId = $null
+    )
+
+    Write-Info "Acquiring Entra access token using Azure CLI..."
+
+    try {
+        # Azure DevOps resource ID for token scope
+        $adoResourceId = "499b84ac-1321-427f-aa17-267ca6975798"
+        
+        # Get token using az account get-access-token
+        $tokenJson = az account get-access-token --resource $adoResourceId 2>$null | ConvertFrom-Json
+        
+        if (-not $tokenJson.accessToken) {
+            throw "Failed to retrieve access token. Ensure you are logged in with 'az login'"
+        }
+        
+        # Get current user info
+        $accountInfo = az account show 2>$null | ConvertFrom-Json
+        Write-Info "Authenticated as: $($accountInfo.user.name)"
+        Write-Debug "[Get-EntraAccessToken] User: $($accountInfo.user.name) (ID: $($accountInfo.user.name))"
+        Write-Debug "[Get-EntraAccessToken] Token acquired for Azure DevOps resource"
+        
+        return $tokenJson.accessToken
+    }
+    catch {
+        throw "Failed to get Entra token: $_. Please run 'az login' first and ensure the account is a member of your Azure DevOps organization."
+    }
+}
+
 function Get-AdoAuthHeader {
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Pat
-    )
-
-    $token = [Convert]::ToBase64String(
-        [Text.Encoding]::ASCII.GetBytes(":$Pat")
+        [string]$AccessToken
     )
 
     return @{
-        Authorization = "Basic $token"
+        Authorization = "Bearer $AccessToken"
         "Content-Type" = "application/json"
     }
 }
@@ -334,7 +374,6 @@ function Complete-AdoTestRun {
 
 $adoOrg = $env:ADO_ORG
 $adoProject = $env:ADO_PROJECT
-$adoPat = $env:ADO_PAT
 
 if ([string]::IsNullOrWhiteSpace($adoOrg)) {
     throw "Missing environment variable: ADO_ORG"
@@ -344,16 +383,14 @@ if ([string]::IsNullOrWhiteSpace($adoProject)) {
     throw "Missing environment variable: ADO_PROJECT"
 }
 
-if ([string]::IsNullOrWhiteSpace($adoPat)) {
-    throw "Missing environment variable: ADO_PAT"
-}
-
 Write-Info "ADO Organization: $adoOrg"
 Write-Info "ADO Project: $adoProject"
 Write-Info "TRX Path: $TrxPath"
 Write-Info "Mapping Path: $MappingPath"
 
-$headers = Get-AdoAuthHeader -Pat $adoPat
+# Acquire Entra access token
+$accessToken = Get-EntraAccessToken
+$headers = Get-AdoAuthHeader -AccessToken $accessToken
 
 $mappingRoot = Get-Content $MappingPath -Raw | ConvertFrom-Json
 $mappingLookup = Get-TestCaseMappings -Path $MappingPath
