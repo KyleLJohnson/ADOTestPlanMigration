@@ -5,8 +5,8 @@ namespace SampleTests
     [TestClass]
     public class LoginTests
     {
-        private string _validUsername;
-        private string _validPassword;
+        private string? _validUsername;
+        private string? _validPassword;
 
         [TestInitialize]
         public void Setup()
