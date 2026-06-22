@@ -21,11 +21,9 @@ jobs:
       - name: Validate Azure CLI token for Azure DevOps
         shell: pwsh
         run: |
-          az account list --all --output table | Out-String
+          az account list --all --output table
           $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
-          if ([string]::IsNullOrWhiteSpace($token)) {
-            throw "Failed to acquire Azure DevOps access token after login."
-          }
+          if (-not $token) { throw "Failed to acquire Azure DevOps access token after login." }
 
       - name: Validate Azure CLI token for Azure DevOps
         shell: pwsh
