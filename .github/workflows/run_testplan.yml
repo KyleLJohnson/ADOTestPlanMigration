@@ -31,3 +31,17 @@ jobs:
         with:
           name: test-results
           path: ./data/test-results
+      - name: Publish Test Results Back to ADO
+        shell: pwsh
+        env:
+          ADO_ORG: ${{ secrets.ADO_ORG }}
+          ADO_PROJECT: ${{ secrets.ADO_PROJECT }}
+          ADO_PAT: ${{ secrets.ADO_PAT }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          ./scripts/publish-test-results.ps1 `
+            -TrxPath "./data/test-results/results.trx" `
+            -MappingPath "./mapping/testcase-mapping.json" `
+            -RunName "GitHub POC - Login Tests"
