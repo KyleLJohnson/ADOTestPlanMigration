@@ -1,12 +1,3 @@
-$trxFile = "./data/test-results/results.trx"
-
-Write-Host "Parsing TRX and preparing ADO test run payload..."
-
-# Simplified placeholder logic
-# Extend with:
-# - Parse TRX XML
-# - Map to ADO TestCase IDs
-# - POST to ADO Test Runs API
 <#
 .SYNOPSIS
 Publishes .NET TRX test results back to Azure DevOps Test Runs.
@@ -34,6 +25,10 @@ Example:
   -TrxPath "./data/test-results/results.trx" `
   -MappingPath "./mapping/testcase-mapping.json"
 #>
+
+$trxFile = "./data/test-results/results.trx"
+
+Write-Host "Parsing TRX and preparing ADO test run payload..."
 
 param(
     [string]$TrxPath = "/data/test-results/results.trx",
