@@ -32,6 +32,7 @@ jobs:
           $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
           if ([string]::IsNullOrWhiteSpace($token)) {
             throw "Failed to acquire Azure DevOps access token after login."
+          }
 
       - name: Restore
         run: dotnet restore ./src/SampleTests/
