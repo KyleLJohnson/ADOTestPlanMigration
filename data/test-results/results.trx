@@ -1,1 +1,47 @@
-test
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="1234" name="Test Run" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-22T18:00:00Z" start="2026-06-22T18:00:01Z" finish="2026-06-22T18:00:05Z" />
+  
+  <TestDefinitions>
+    <UnitTest name="VerifyLoginSuccess">
+      <Execution id="1" />
+      <TestMethod 
+        className="SampleTests.LoginTests"
+        name="VerifyLoginSuccess" />
+    </UnitTest>
+
+    <UnitTest name="VerifyLoginFailure_InvalidPassword">
+      <Execution id="2" />
+      <TestMethod 
+        className="SampleTests.LoginTests"
+        name="VerifyLoginFailure_InvalidPassword" />
+    </UnitTest>
+
+    <UnitTest name="VerifyLoginFailure_InvalidUsername">
+      <Execution id="3" />
+      <TestMethod 
+        className="SampleTests.LoginTests"
+        name="VerifyLoginFailure_InvalidUsername" />
+    </UnitTest>
+  </TestDefinitions>
+
+  <Results>
+    <UnitTestResult 
+      executionId="1"
+      testName="SampleTests.LoginTests.VerifyLoginSuccess"
+      outcome="Passed"
+      duration="00:00:00.123" />
+
+    <UnitTestResult 
+      executionId="2"
+      testName="SampleTests.LoginTests.VerifyLoginFailure_InvalidPassword"
+      outcome="Passed"
+      duration="00:00:00.110" />
+
+    <UnitTestResult 
+      executionId="3"
+      testName="SampleTests.LoginTests.VerifyLoginFailure_InvalidUsername"
+      outcome="Passed"
+      duration="00:00:00.105" />
+  </Results>
+</TestRun>
