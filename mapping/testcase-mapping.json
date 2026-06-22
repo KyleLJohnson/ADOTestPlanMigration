@@ -1,27 +1,61 @@
 {
-  "testPlanId": 8,
-  "testSuites": [
-    {
-      "suiteId": 9,
-      "suiteName": "Login Tests",
-      "testCases": [
-        {
-          "adoTestCaseId": 10,
-          "title": "Verify login success",
-          "automation": {
-            "repo": "kyleljohnson/adotestplans",
-            "file": "SampleTests/LoginTests.cs",
-            "fullyQualifiedName": "SampleTests.LoginTests.VerifyLoginSuccess",
-            "framework": "MSTest"
-          },
-          "steps": [
-            {
-              "action": "Enter username",
-              "expected": "Username accepted"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+    "schemaVersion":  "1.0",
+    "generatedOnUtc":  "2026-06-22T21:08:34.4123680Z",
+    "adoOrganization":  "kljdemoorg",
+    "adoProject":  "Contoso Bank",
+    "testPlanId":  47,
+    "testPlanName":  "GitHub POC - Login Tests",
+    "testSuites":  [
+                       {
+                           "suiteId":  49,
+                           "suiteName":  "Login Tests",
+                           "testCases":  [
+                                             {
+                                                 "adoTestCaseId":  50,
+                                                 "adoTestPointId":  "",
+                                                 "title":  "VerifyLoginSuccess",
+                                                 "configuration":  {
+                                                                       "id":  "4",
+                                                                       "name":  "Windows 11 - Chrome"
+                                                                   },
+                                                 "automation":  {
+                                                                    "repo":  "TODO_ORG/TODO_REPO",
+                                                                    "file":  "src/SampleTests/LoginTests.cs",
+                                                                    "fullyQualifiedName":  "SampleTests.LoginTests.VerifyLoginSuccess",
+                                                                    "framework":  "MSTest"
+                                                                }
+                                             },
+                                             {
+                                                 "adoTestCaseId":  51,
+                                                 "adoTestPointId":  "",
+                                                 "title":  "VerifyLoginFailure_InvalidPassword",
+                                                 "configuration":  {
+                                                                       "id":  "4",
+                                                                       "name":  "Windows 11 - Chrome"
+                                                                   },
+                                                 "automation":  {
+                                                                    "repo":  "TODO_ORG/TODO_REPO",
+                                                                    "file":  "src/SampleTests/LoginTests.cs",
+                                                                    "fullyQualifiedName":  "SampleTests.LoginTests.VerifyLoginFailure_InvalidPassword",
+                                                                    "framework":  "MSTest"
+                                                                }
+                                             },
+                                             {
+                                                 "adoTestCaseId":  52,
+                                                 "adoTestPointId":  "",
+                                                 "title":  "VerifyLoginFailure_InvalidUsername",
+                                                 "configuration":  {
+                                                                       "id":  "4",
+                                                                       "name":  "Windows 11 - Chrome"
+                                                                   },
+                                                 "automation":  {
+                                                                    "repo":  "TODO_ORG/TODO_REPO",
+                                                                    "file":  "src/SampleTests/LoginTests.cs",
+                                                                    "fullyQualifiedName":  "SampleTests.LoginTests.VerifyLoginFailure_InvalidUsername",
+                                                                    "framework":  "MSTest"
+                                                                }
+                                             }
+                                         ]
+                       }
+                   ]
 }
