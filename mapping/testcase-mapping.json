@@ -9,9 +9,9 @@
           "adoTestCaseId": 10,
           "title": "Verify login success",
           "automation": {
-            "repo": "kyjohnso_microsoft/adotestplans",
-            "file": "Tests/LoginTests.cs",
-            "fullyQualifiedName": "Tests.LoginTests.VerifyLoginSuccess",
+            "repo": "kyleljohnson/adotestplans",
+            "file": "SampleTests/LoginTests.cs",
+            "fullyQualifiedName": "SampleTests.LoginTests.VerifyLoginSuccess"",
             "framework": "NUnit"
           },
           "steps": [
