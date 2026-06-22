@@ -158,6 +158,12 @@ function Get-TestCaseMappings {
                 continue
             }
 
+            # Safely get priority with fallback to default (2 = Normal)
+            $priority = 2
+            if ($testCase | Get-Member -Name priority -ErrorAction SilentlyContinue) {
+                $priority = $testCase.priority
+            }
+
             $lookup[$fqn] = [pscustomobject]@{
                 AdoTestCaseId      = $testCase.adoTestCaseId
                 AdoTestPointId     = $testCase.adoTestPointId
@@ -165,7 +171,7 @@ function Get-TestCaseMappings {
                 FullyQualifiedName = $fqn
                 SuiteId            = $suite.suiteId
                 SuiteName          = $suite.suiteName
-                Priority           = if ($testCase.priority) { $testCase.priority } else { 2 }
+                Priority           = $priority
             }
         }
     }
