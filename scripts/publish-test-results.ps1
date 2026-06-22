@@ -36,7 +36,7 @@ Example:
 #>
 
 param(
-    [string]$TrxPath = "./data/test-results/results.trx",
+    [string]$TrxPath = "/data/test-results/results.trx",
     [string]$MappingPath = "./mapping/testcase-mapping.json",
     [string]$RunName = "GitHub .NET Test Run",
     [string]$ApiVersion = "7.1"
