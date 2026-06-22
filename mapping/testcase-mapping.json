@@ -1,0 +1,27 @@
+{
+  "testPlanId": 8,
+  "testSuites": [
+    {
+      "suiteId": 9,
+      "suiteName": "Login Tests",
+      "testCases": [
+        {
+          "adoTestCaseId": 10,
+          "title": "Verify login success",
+          "automation": {
+            "repo": "kyjohnso_microsoft/adotestplans",
+            "file": "Tests/LoginTests.cs",
+            "fullyQualifiedName": "Tests.LoginTests.VerifyLoginSuccess",
+            "framework": "NUnit"
+          },
+          "steps": [
+            {
+              "action": "Enter username",
+              "expected": "Username accepted"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
