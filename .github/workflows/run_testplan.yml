@@ -1,0 +1,33 @@
+name: Run .NET Tests
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore ./src/SampleTests/
+
+      - name: Build
+        run: dotnet build ./src/SampleTests/ --no-restore
+
+      - name: Run Tests
+        run: dotnet test ./src/SampleTests/ --logger trx --results-directory ./data/test-results
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ./data/test-results
