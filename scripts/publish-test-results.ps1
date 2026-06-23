@@ -69,31 +69,25 @@ function Get-EntraAccessToken {
         [string]$TenantId = $null
     )
 
-    Write-Info "Acquiring Entra access token using Azure CLI..."
+    Write-Info "Acquiring Azure DevOps access token from already-authenticated Azure CLI context..."
 
     try {
-
-        az login --service-principal --username $env:AZURE_CLIENT_ID --password $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID --allow-no-subscriptions
         # Azure DevOps resource ID for token scope
         $adoResourceId = "499b84ac-1321-427f-aa17-267ca6975798"
         
         # Get token using az account get-access-token
+        # Assumes azure/login has already authenticated in the parent GitHub Action
         $tokenJson = az account get-access-token --resource $adoResourceId 2>$null | ConvertFrom-Json
         
         if (-not $tokenJson.accessToken) {
-            throw "Failed to retrieve access token. Ensure you are logged in with 'az login'"
+            throw "Failed to retrieve access token."
         }
         
-        # Get current user info
-        $accountInfo = az account show 2>$null | ConvertFrom-Json
-        Write-Info "Authenticated as: $($accountInfo.user.name)"
-        Write-Debug "[Get-EntraAccessToken] User: $($accountInfo.user.name) (ID: $($accountInfo.user.name))"
         Write-Debug "[Get-EntraAccessToken] Token acquired for Azure DevOps resource"
-        
         return $tokenJson.accessToken
     }
     catch {
-        throw "Failed to get Entra token: $_. Please run 'az login' first and ensure the account is a member of your Azure DevOps organization."
+        throw "Failed to get access token: $_. Ensure 'azure/login' GitHub Action ran first."
     }
 }
 
