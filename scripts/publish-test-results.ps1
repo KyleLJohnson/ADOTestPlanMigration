@@ -69,7 +69,7 @@ function Get-EntraAccessToken {
         [string]$TenantId = $null
     )
 
-    Write-Info "Acquiring Azure DevOps access token from already-authenticated Azure CLI context..."
+    Write-Info "Acquiring Azure DevOps access token from Azure CLI context..."
 
     try {
         # Azure DevOps resource ID for token scope
@@ -87,7 +87,7 @@ function Get-EntraAccessToken {
         return $tokenJson.accessToken
     }
     catch {
-        throw "Failed to get access token: $_. Ensure 'azure/login' GitHub Action ran first."
+        throw "Failed to get access token: $_. Ensure 'azure/login' GitHub Action ran first and the service principal is activated in Azure DevOps."
     }
 }
 
@@ -100,6 +100,41 @@ function Get-AdoAuthHeader {
     return @{
         Authorization = "Bearer $AccessToken"
         "Content-Type" = "application/json"
+    }
+}
+
+function Invoke-AdoServicePrincipalActivation {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Organization,
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Headers
+    )
+
+    Write-Info "Activating service principal in Azure DevOps..."
+
+    try {
+        # Make a simple API call to trigger service principal activation
+        $uri = "https://dev.azure.com/$Organization/_apis/projects?api-version=7.1&`$top=1"
+        
+        $response = Invoke-RestMethod `
+            -Method Get `
+            -Uri $uri `
+            -Headers $Headers `
+            -ErrorAction Stop
+
+        Write-Info "Service principal is active and authenticated."
+        return $true
+    }
+    catch {
+        $errorMessage = $_.Exception.Message
+        
+        if ($errorMessage -match "TF401444") {
+            throw "Service principal requires activation. Please sign in with the service principal in a browser first: https://dev.azure.com/$Organization"
+        }
+        else {
+            throw "Failed to activate service principal: $errorMessage"
+        }
     }
 }
 
@@ -393,6 +428,9 @@ Write-Info "Mapping Path: $MappingPath"
 # Acquire Entra access token
 $accessToken = Get-EntraAccessToken
 $headers = Get-AdoAuthHeader -AccessToken $accessToken
+
+# Activate service principal if needed
+Invoke-AdoServicePrincipalActivation -Organization $adoOrg -Headers $headers
 
 $mappingRoot = Get-Content $MappingPath -Raw | ConvertFrom-Json
 $mappingLookup = Get-TestCaseMappings -Path $MappingPath
