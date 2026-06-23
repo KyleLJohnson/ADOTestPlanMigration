@@ -63,31 +63,34 @@ function Write-Fail {
     Write-Host "[ERROR] $Message" -ForegroundColor Red
 }
 
-function Get-EntraAccessToken {
+function Get-AdoAccessToken {
     param(
         [Parameter(Mandatory = $false)]
         [string]$TenantId = $null
     )
 
-    Write-Info "Acquiring Azure DevOps access token from Azure CLI context..."
+    Write-Info "Acquiring Azure DevOps access token..."
 
+    # Use PAT if available (preferred)
+    if ($env:ADO_PAT) {
+        Write-Info "Using Personal Access Token from ADO_PAT environment variable"
+        return $env:ADO_PAT
+    }
+
+    # Fallback to Entra token
     try {
-        # Azure DevOps resource ID for token scope
         $adoResourceId = "499b84ac-1321-427f-aa17-267ca6975798"
-        
-        # Get token using az account get-access-token
-        # Assumes azure/login has already authenticated in the parent GitHub Action
         $tokenJson = az account get-access-token --resource $adoResourceId 2>$null | ConvertFrom-Json
         
         if (-not $tokenJson.accessToken) {
             throw "Failed to retrieve access token."
         }
         
-        Write-Debug "[Get-EntraAccessToken] Token acquired for Azure DevOps resource"
+        Write-Debug "[Get-AdoAccessToken] Token acquired for Azure DevOps resource"
         return $tokenJson.accessToken
     }
     catch {
-        throw "Failed to get access token: $_. Ensure 'azure/login' GitHub Action ran first and the service principal is activated in Azure DevOps."
+        throw "Failed to get access token: $_. Provide ADO_PAT environment variable or ensure 'azure/login' GitHub Action ran first."
     }
 }
 
@@ -97,43 +100,19 @@ function Get-AdoAuthHeader {
         [string]$AccessToken
     )
 
-    return @{
-        Authorization = "Bearer $AccessToken"
-        "Content-Type" = "application/json"
-    }
-}
-
-function Invoke-AdoServicePrincipalActivation {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Organization,
-        [Parameter(Mandatory = $true)]
-        [hashtable]$Headers
-    )
-
-    Write-Info "Activating service principal in Azure DevOps..."
-
-    try {
-        # Make a simple API call to trigger service principal activation
-        $uri = "https://dev.azure.com/$Organization/_apis/projects?api-version=7.1&`$top=1"
-        
-        $response = Invoke-RestMethod `
-            -Method Get `
-            -Uri $uri `
-            -Headers $Headers `
-            -ErrorAction Stop
-
-        Write-Info "Service principal is active and authenticated."
-        return $true
-    }
-    catch {
-        $errorMessage = $_.Exception.Message
-        
-        if ($errorMessage -match "TF401444") {
-            throw "Service principal requires activation. Please sign in with the service principal in a browser first: https://dev.azure.com/$Organization"
+    # If it looks like a PAT (alphanumeric, typically 52 chars), use Basic auth
+    if ($AccessToken -match '^[a-z0-9]+$' -and $AccessToken.Length -gt 30) {
+        $base64Token = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$AccessToken"))
+        return @{
+            Authorization = "Basic $base64Token"
+            "Content-Type" = "application/json"
         }
-        else {
-            throw "Failed to activate service principal: $errorMessage"
+    }
+    else {
+        # Bearer token (Entra)
+        return @{
+            Authorization = "Bearer $AccessToken"
+            "Content-Type" = "application/json"
         }
     }
 }
@@ -425,12 +404,9 @@ Write-Info "ADO Project: $adoProject"
 Write-Info "TRX Path: $TrxPath"
 Write-Info "Mapping Path: $MappingPath"
 
-# Acquire Entra access token
-$accessToken = Get-EntraAccessToken
+# Acquire access token (PAT preferred, falls back to Entra)
+$accessToken = Get-AdoAccessToken
 $headers = Get-AdoAuthHeader -AccessToken $accessToken
-
-# Activate service principal if needed
-Invoke-AdoServicePrincipalActivation -Organization $adoOrg -Headers $headers
 
 $mappingRoot = Get-Content $MappingPath -Raw | ConvertFrom-Json
 $mappingLookup = Get-TestCaseMappings -Path $MappingPath
