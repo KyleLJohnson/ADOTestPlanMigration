@@ -100,8 +100,8 @@ function Get-AdoAuthHeader {
         [string]$AccessToken
     )
 
-    # If it looks like a PAT (alphanumeric, typically 52 chars), use Basic auth
-    if ($AccessToken -match '^[a-z0-9]+$' -and $AccessToken.Length -gt 30) {
+    # Use Basic auth if this token came from ADO_PAT, otherwise Bearer (Entra)
+    if ($env:ADO_PAT -and $AccessToken -eq $env:ADO_PAT) {
         $base64Token = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$AccessToken"))
         return @{
             Authorization = "Basic $base64Token"
@@ -109,13 +109,12 @@ function Get-AdoAuthHeader {
         }
     }
     else {
-        # Bearer token (Entra)
         return @{
             Authorization = "Bearer $AccessToken"
             "Content-Type" = "application/json"
         }
     }
-}
+  }
 
 function Convert-TrxOutcomeToAdoOutcome {
     param([string]$TrxOutcome)
