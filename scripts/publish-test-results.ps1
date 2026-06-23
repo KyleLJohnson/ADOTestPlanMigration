@@ -72,6 +72,8 @@ function Get-EntraAccessToken {
     Write-Info "Acquiring Entra access token using Azure CLI..."
 
     try {
+
+        az login --service-principal --username $env:AZURE_CLIENT_ID --password $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID --allow-no-subscriptions
         # Azure DevOps resource ID for token scope
         $adoResourceId = "499b84ac-1321-427f-aa17-267ca6975798"
         
